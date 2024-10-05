@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,7 +29,7 @@ class ParametrizedTests {
 
     @DisplayName("Roman numeral")
     @ParameterizedTest(name ="\"{0}\" should be {1}")
-    @CsvSource({"I, 1", "II, 2", "III, 3"})
+    @CsvSource({"I, 1", "II, 2", "III, 3",  "'Hello, JUnit 5!', 15" })
     void withNiceName(String word, int number) {
 
     }
@@ -85,4 +86,11 @@ class ParametrizedTests {
     }
     // Arguments is a simple interface wrapping an array of objects and Arguments.of(Object... args) creates an instance of it from the specified varargs.
 
+    // The method called by @MethodSource must return a kind of collection, which can be any Stream (including the primitive specializations),
+    // Iterable, Iterator, or array. It must be static, can be private, and doesn't have to be in the same class: @MethodSource("org.codefx.Words#provide") works, too.
+
+
+    @ParameterizedTest
+    @CsvFileSource(resources = "/word-lengths.csv")
+    void withCsvSource(String word, int length) { }
 }
