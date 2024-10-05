@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
@@ -93,4 +95,17 @@ class ParametrizedTests {
     @ParameterizedTest
     @CsvFileSource(resources = "/word-lengths.csv")
     void withCsvSource(String word, int length) { }
+
+    // @ParameterizedTest
+    // @CsvSource({ "(0/0), 0", "(0/1), 1", "(1/1), 1.414" })
+    // void convertPointNorm(@ConvertPoint Point point, double norm) { }
+
+    @ParameterizedTest
+    @CsvSource({"true, 3.14159265359, AUGUST, 2018, 2018-08-23T22:00:00"})
+    void testDefaultConverters(
+        boolean b, double d, Summer s, Year y, LocalDateTime dt) { }
+
+    enum Summer {
+        JUNE, JULY, AUGUST, SEPTEMBER;
+    }
 }
