@@ -12,7 +12,12 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestReporter;
+import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.aggregator.AggregateWith;
+import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregationException;
+import org.junit.jupiter.params.aggregator.ArgumentsAggregator;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -108,4 +113,40 @@ class ParametrizedTests {
     enum Summer {
         JUNE, JULY, AUGUST, SEPTEMBER;
     }
+
+    @ParameterizedTest
+    @CsvSource({ "0, 0, 0", "1, 0, 1", "1.414, 1, 1" })
+    void testPointNorm(double norm, ArgumentsAccessor arguments) {
+        Point point = Point.from(
+            arguments.getDouble(1), arguments.getDouble(2));
+        /*...*/
+    }
+    record Point(double x, double y) {
+        static Point from(double x, double y) {
+            return new Point(x, y);
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "0, 0, 0", "1, 0, 1", "1.414, 1, 1" })
+    void testPointNorm(
+        double norm,
+        @AggregateWith(PointAggregator.class) Point point) {
+        /*...*/
+    }
+
+    static class PointAggregator implements ArgumentsAggregator {
+
+        @Override
+        public Object aggregateArguments(
+            ArgumentsAccessor arguments, ParameterContext context)
+            throws ArgumentsAggregationException {
+            return Point.from(
+                arguments.getDouble(1), arguments.getDouble(2));
+        }
+
+    }
+    // Argument Accessors And Aggregators
+
+
 }
