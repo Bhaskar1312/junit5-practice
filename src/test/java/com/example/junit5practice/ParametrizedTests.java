@@ -4,12 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestReporter;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 // https://nipafx.dev/junit-5-parameterized-tests/
@@ -45,5 +50,39 @@ class ParametrizedTests {
     void testMetaAnnotation(String word) {
         assertNotNull(word);
     }
+
+    // Arguments are provided by sources and you can use as many as you want for a test method
+    // but need at least one or you get the aforementioned PreconditionViolationException.
+    // @ValueSource - pick only one from strings, ints, longs, doubles, chars, booleans, classes, enums
+
+    @ParameterizedTest
+    @EnumSource(TimeUnit.class)
+    void withAllEnumValues(TimeUnit unit) {
+        assertNotNull(unit);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+        value = TimeUnit.class,
+        names = {"NANOSECONDS", "HOURS"}
+    )
+    void withSomeEnumValues(TimeUnit unit) {
+        assertNotNull(unit);
+    }
+    // note that @EnumSource only creates arguments for one parameter and so it can only be used on single-parameter methods.
+    //  if you need more detailed control over which enum values are provided, take a look at @EnumSource's mode attribute.
+
+
+    @ParameterizedTest
+    @MethodSource("createWordsWithLength")
+    void withMethodSource(String word, int length) { }
+
+    private static Stream<Arguments> createWordsWithLength() {
+        return Stream.of(
+            Arguments.of("hello", 5),
+            Arguments.of("Junit 5", 7)
+        );
+    }
+    // Arguments is a simple interface wrapping an array of objects and Arguments.of(Object... args) creates an instance of it from the specified varargs.
 
 }
