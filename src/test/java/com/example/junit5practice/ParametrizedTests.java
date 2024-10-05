@@ -9,6 +9,7 @@ import java.time.Year;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInfo;
 import org.junit.jupiter.api.TestReporter;
@@ -24,6 +25,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.platform.commons.util.StringUtils;
 
 // https://nipafx.dev/junit-5-parameterized-tests/
 class ParametrizedTests {
@@ -147,6 +149,64 @@ class ParametrizedTests {
 
     }
     // Argument Accessors And Aggregators
+
+
+    // https://mikemybytes.com/2021/10/19/parameterize-like-a-pro-with-junit-5-csvsource/
+    @ParameterizedTest
+    @CsvSource(textBlock = """
+        hello world, 11
+        Junit, 5, 7
+        Junit 5, 7
+        """)
+    void calculatesPhraseLength(String phrase, int expectedLength) {
+        Assertions.assertEquals(expectedLength, phrase.length());
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiter = '|', textBlock = """
+    Hello world!    | Hallo Welt!   | 12
+    Spock           | JUnit Jupiter | 13
+                    | Java          |  4
+    ''              | ''            |  0
+""")
+    void calculatesMaxLength(String phrase1, String phrase2, int expected) {
+        int actual = Integer.max(phrase1==null? 0:phrase1.length(), phrase2.length());
+        Assertions.assertEquals(expected, actual);
+    }
+    // An empty, quoted value '' results in an empty String unless the emptyValue attribute is set; whereas, an entirely empty value is interpreted as a null reference.
+
+    @ParameterizedTest
+    @CsvSource(delimiterString = "->", textBlock = """
+    fooBar        -> FooBar
+    junit_jupiter -> JunitJupiter
+    CsvSource     -> CsvSource
+""")
+    void convertsToUpperCamelCase(String input, String expected) {
+        // String converted = caseConverter.toUpperCamelCase(input);
+        // Assertions.assertEquals(expected, converted);
+    }
+
+    @ParameterizedTest
+    @CsvSource(delimiterString = "maps to", textBlock = """
+    'foo'    maps to  'bar'
+    'junit'  maps to  'jupiter'
+""")
+    void shouldMapPair(String input, String expected) {
+        // String actual = pairMapper.map(input);
+        // Assertions.assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest(name = "{index} => calculates the sum of {0}: ({1}, {2})")
+    @CsvSource(delimiter = '|', textBlock = """
+    positive numbers      |   10  |      6  |   16
+    positive and negative |   -4  |      2  |   -2
+    negative numbers      |   -6  |   -100  | -106
+""")
+    void calculatesSum(String description, int a, int b, int expectedSum) {
+        int actual = a + b;
+        Assertions.assertEquals(expectedSum, actual);
+    }
+
 
 
 }
